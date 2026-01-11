@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <div id="sheet"></div>
+
+    <script>
+        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQKmS5vEjBt1V7Q1ba9x5nGw9wY0YmgP-rmi7zgx3PfeSiZTJP4Xa-Bf6Cj4xi6Yu6eGllOJAbrBpkI/pub?output=csv";
+
+        async function loadSheet() {
+            try {
+                const response = await fetch(sheetURL);
+                const csvText = await response.text();
+                const rows = csvText.trim().split("\n").map(r => r.split(","));
+
+                let html = "<table>";
+                rows.forEach((row, i) => {
+                    html += "<tr>";
+                    row.forEach(cell => {
+                        html += i === 0 ? `<th>${cell}</th>` : `<td>${cell}</td>`;
+                    });
+                    html += "</tr>";
+                });
+                html += "</table>";
+
+                document.getElementById("sheet").innerHTML = html;
+            } catch (error) {
+                document.getElementById("sheet").innerHTML = "Error loading sheet.";
+                console.error(error);
+            }
+        }
+
+        // Initial load
+        loadSheet();
+
+        // Auto-refresh every hour
+        setInterval(loadSheet, 3600000);
+    </script>
+</body>
+</html>
